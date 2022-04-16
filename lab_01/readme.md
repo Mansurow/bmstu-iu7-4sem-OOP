@@ -19,7 +19,7 @@
 
 ### Реализация
 
-![image](https://github.com/Mansurow/bmstu_OOP/blob/developer/semester_4/%D0%9E%D0%9E%D0%9F/lab_01/screen.png)
+![image](https://github.com/Mansurow/bmstu_OOP/blob/master/lab_01/screen.png)
 
 ### Cоветы
 
