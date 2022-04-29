@@ -721,7 +721,8 @@ void Vector<Type>::vecMul(Vector<Type> &res, const Vector<Type> &fV, const Vecto
 
 // Выделение памяти под новый вектор.
 template<typename Type>
-void Vector<Type>::allocNewVectorMem(int amount) {
+void Vector<Type>::allocNewVectorMem(int amount)
+{
     time_t currentTime = time(NULL);
     try
     {
@@ -737,15 +738,30 @@ void Vector<Type>::allocNewVectorMem(int amount) {
 
 
 template<typename Type>
-Iterator<Type> Vector<Type>::begin() noexcept {
+Iterator<Type> Vector<Type>::begin() noexcept
+{
     Iterator<Type> iterator(*this);
     return iterator;
 }
 
 template<typename Type>
-Iterator<Type> Vector<Type>::end() noexcept{
+Iterator<Type> Vector<Type>::end() noexcept
+{
     Iterator<Type> iterator(*this);
     return iterator + this->size;
 }
 
+template<typename Type>
+ConstIterator<Type> Vector<Type>::begin() const noexcept
+{
+    ConstIterator<Type> iterator(*this);
+    return iterator;
+}
+
+template<typename Type>
+ConstIterator<Type> Vector<Type>::end() const noexcept
+{
+    ConstIterator<Type> iterator(*this);
+    return iterator + this->vector_size;
+}
 #endif // VECTOR_HPP

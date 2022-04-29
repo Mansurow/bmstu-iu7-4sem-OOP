@@ -10,6 +10,7 @@
 
 #include "base_vector.h"
 #include "iterator.hpp"
+#include "const_iterator.h"
 #include "errors.h"
 
 #define EPS 1e-8
@@ -21,6 +22,7 @@ class Vector: public BaseVector
 {
 public:
     friend class Iterator<Type>;
+    friend class ConstIterator<Type>;
 
     Vector();
     explicit Vector(int len);
@@ -96,6 +98,9 @@ public:
 
     Iterator<Type> begin() noexcept;
     Iterator<Type> end() noexcept;
+
+    ConstIterator<Type> begin() const noexcept;
+    ConstIterator<Type> end() const noexcept;
 
 protected:
     Type sumValue();
