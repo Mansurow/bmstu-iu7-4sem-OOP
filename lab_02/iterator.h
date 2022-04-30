@@ -25,6 +25,9 @@ public:
    const Type* operator ->() const;
    operator bool() const;
 
+         Type &operator [](int index);
+   const Type &operator [](int index) const;
+
    Iterator<Type>& operator =(const Iterator<Type>& iterator);
 
    Iterator<Type>& operator +=(int number);
@@ -43,7 +46,7 @@ public:
    bool operator >(const Iterator<Type>& iterator) const;
    bool operator ==(const Iterator<Type>& iterator) const;
    bool operator !=(const Iterator<Type>& iterator) const;
-
+ // []
 protected:
     Type* get_cur_ptr() const;
 
@@ -51,7 +54,7 @@ protected:
     void check_validity(int) const; // проверака
 
 private:
-    std::weak_ptr<Type> weakPtr;
+    std::weak_ptr<Type[]> weakPtr;
 };
 
 #endif // ITERATOR_H

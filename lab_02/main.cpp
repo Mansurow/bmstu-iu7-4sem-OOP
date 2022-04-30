@@ -19,7 +19,8 @@ int main()
 
     Vector<int> operVecF = {4, 2, 4};
     Vector<int> operVecS = {3, 1, 5};
-
+    Vector<double> oper = {1.0, 2.0, 1.0};
+    //cout<< (oper / 10.0) << endl;
     cout<< "Normalization of the vector: "<< operVecS << "=>" << operVecS.getSingle() << endl;
     cout<< "Size vector: " << initializing.getSize()<< endl;
     cout<< "Vector length: "<<initializing.getLength()<< endl;

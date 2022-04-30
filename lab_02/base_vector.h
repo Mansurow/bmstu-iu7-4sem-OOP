@@ -6,8 +6,6 @@
 class BaseVector
 {
 public:
-    BaseVector();
-    BaseVector(const BaseVector&);
     virtual ~BaseVector() = default;
 
     virtual bool isEmpty() const = 0;
@@ -16,15 +14,5 @@ public:
 protected:
     int size = 0;
 };
-
-BaseVector::BaseVector()
-{
-    size = 0;
-}
-
-BaseVector::BaseVector(const BaseVector& vector)
-{
-   size = vector.size;
-}
 
 #endif // BASE_VECTOR_H

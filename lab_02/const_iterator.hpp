@@ -186,6 +186,16 @@ bool ConstIterator<Type>::operator !=(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
+const Type &ConstIterator<Type>::operator [](int index) const
+{
+    check_object(__LINE__);
+    check_validity(__LINE__);
+
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
+    return copy_ptr.get() + index;
+}
+
+template<typename Type>
 ConstIterator<Type>::operator bool() const
 {
     check_object(__LINE__);
@@ -209,7 +219,7 @@ void ConstIterator<Type>::check_object(int line) const
 
 template<typename Type>
 void ConstIterator<Type>::check_validity(int line) const {
-    if (this->index >= this->size)
+    if (this->index < 0 || this->index >= this->size)
     {
         time_t currentTime = time(NULL);
         throw InvalidIterator(__FILE__, typeid(*this).name(), line, ctime(&currentTime));

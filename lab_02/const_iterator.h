@@ -21,6 +21,8 @@ public:
 
    const Type& operator *() const;
    const Type* operator ->() const;
+
+   const Type &operator [](int index) const;
    operator bool() const;
 
    ConstIterator<Type>& operator =(const ConstIterator<Type>& iterator);
@@ -49,7 +51,7 @@ protected:
     void check_validity(int) const; // проверака
 
 private:
-    std::weak_ptr<Type> weakPtr;
+    std::weak_ptr<Type[]> weakPtr;
 };
 
 #endif // CONST_ITERATOR_H

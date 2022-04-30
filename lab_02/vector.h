@@ -16,7 +16,10 @@
 #define EPS 1e-8
 
 using namespace std;
-
+// на каждый оператор сделать метод с соотвествующим название
+// умножение элементов вектора
+// умножение двух элементов вектора
+// так же с суммой
 template<typename Type>
 class Vector: public BaseVector
 {
@@ -42,12 +45,10 @@ public:
           Type &getItem(int index);
     const Type &getItem(int index) const;
 
-
-
           Type &operator [](int index);
     const Type &operator [](int index) const;
 
-    double getLength() const;
+    Type getLength() const;
     int getSize() const noexcept override;
     bool isEmpty() const noexcept override;
 
@@ -59,36 +60,63 @@ public:
 
     Vector<Type> getSingle() const; // нормированием вектора
 
-    // Сумма двух векторов
-    Vector<Type> operator +(const Vector<Type> &) const;
-    Vector<Type> &operator +=(const Vector<Type> &);
-    Vector<Type> &sum(const Vector<Type> &);
+    // Сумма двух векторов - DONE
+    template<typename U>
+    decltype(auto) operator +(const Vector<U> &) const;
+     Vector<Type> &operator +=(const Vector<Type> &);
+    template<typename U>
+    decltype(auto) sum(const Vector<U> &) const;
+     Vector<Type> &sumEqual(const Vector<Type> &);
 
-    // Разность двух векторов
-    Vector<Type> &operator -=(const Vector<Type> &);
-    Vector<Type> operator -(const Vector<Type> &) const;
+    // Разность двух векторов - Done
+    template<typename U>
+    decltype(auto) operator -(const Vector<U> &) const;
+     Vector<Type> &operator -=(const Vector<Type> &);
+    template<typename U>
+    decltype(auto) sub(const Vector<U> &) const;
+     Vector<Type> &subEqual(const Vector<Type> &);
     Vector<Type> operator -();
-    Vector<Type> &sub(const Vector<Type> &);
+    Vector<Type> reverse();
 
-    // Умножение на число
-    Vector<Type> operator *(const Type &number) const;
+    // Умножение на число - Done
+    template<typename U>
+    decltype(auto) operator *(const U &number) const;
     Vector<Type> &operator *=(const Type &number);
-    Vector<Type> &mul(const Type &number);
+    template<typename U>
+    decltype(auto) mulNum(const U &number) const;
+    Vector<Type> &mulNumEqual(const Type &number);
+
+    //Умножение элементов двух веткоров - DONE
+    template<typename U>
+    decltype(auto) operator ^(const Vector<U> &) const;
+    Vector<Type> &operator ^=(const Vector<Type>&);
+    template<typename U>
+    decltype(auto) mulElems(const Vector<U> &) const;
+    Vector<Type>  &mulElemsEqual(const Vector<Type> &);
 
     // Скалярное произведение
-    Type operator *(const Vector<Type> &) const;
-    Type operator *=(const Vector<Type> &);
-    Type scalarMul(const Vector<Type> &) const;
+    template<typename U>
+    decltype(auto) operator *(const Vector<U> &) const;
+             Type &operator *=(const Vector<Type> &);
+    template<typename U>
+    decltype(auto) scalarMul(const Vector<U> &) const;
+             Type &scalarMulEqual(const Vector<Type> &);
 
-    // Векторное произведение
-    Vector<Type> operator &(const Vector<Type> &) const;
-    Vector<Type> &operator &=(const Vector<Type> &);
-    Vector<Type> &vectorMul(const Vector<Type> &);
+    // Векторное произведение - Done
+    template<typename U>
+    decltype(auto) operator &(const Vector<U> &) const;
+     Vector<Type> &operator &=(const Vector<Type> &);
+    template<typename U>
+    decltype(auto) vectorMul(const Vector<U> &) const;
+     Vector<Type> &vectorMulEqual(const Vector<Type> &);
 
-    // Деление вектора на число
-    Vector<Type> &operator /=(const Type& number);
-    Vector<Type> operator /(const Type& number) const;
-    Vector<Type> &div(const Type& number);
+    // Деление вектора на число - Done
+    template<typename U>
+    decltype(auto) operator /(const U& number) const;
+     Vector<Type> &operator /=(const Type& number);
+    template<typename U>
+    decltype(auto) divNum(const U& number) const;
+     Vector<Type> &divNumEqual(const Type& number);
 
     // Логические операции
     bool operator ==(const Vector<Type> &) const;
@@ -101,6 +129,8 @@ public:
 
     ConstIterator<Type> begin() const noexcept;
     ConstIterator<Type> end() const noexcept;
+    ConstIterator<Type> cbegin() const noexcept;
+    ConstIterator<Type> cend() const noexcept;
 
 protected:
     Type sumValue();
@@ -110,7 +140,7 @@ protected:
 
     void allocNewVectorMem(int amount);
 private:
-    shared_ptr<Type> values;
+    shared_ptr<Type[]> values; // Type[] - передача болле сложных типов (классов, объектов)
 };
 
 // создан для быстрого вывода вектора
@@ -118,16 +148,12 @@ template<typename Type>
 ostream& operator <<(ostream& os, const Vector<Type>& vec)
 {
     Iterator<Type> iter(vec);
-
-    if (!iter)
-    {
-        os << "Vector is empty.";
-        return os;
-    }
-
-    os << '(' << *iter;
-    for (iter++; iter; iter++)
-        os << ", " << *iter ;
+    os << '(';
+    for (; iter; iter++)
+        if (iter + 1)
+            os << *iter <<  ", ";
+        else
+            os << *iter;
     os << ')';
 
     return os;

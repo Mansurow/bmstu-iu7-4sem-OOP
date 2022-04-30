@@ -57,6 +57,26 @@ const Type* Iterator<Type>::operator ->() const
     return get_cur_ptr();
 }
 
+template<typename Type>
+Type &Iterator<Type>::operator [](int index)
+{
+    check_object(__LINE__);
+    check_validity(__LINE__);
+
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
+    return copy_ptr.get() + index;
+}
+
+template<typename Type>
+const Type &Iterator<Type>::operator [](int index) const
+{
+    check_object(__LINE__);
+    check_validity(__LINE__);
+
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
+    return copy_ptr.get() + index;
+}
+
 // операция присваивания
 template<typename Type>
 Iterator<Type>& Iterator<Type>::operator =(const Iterator<Type>& iterator)
@@ -227,7 +247,7 @@ void Iterator<Type>::check_object(int line) const
 
 template<typename Type>
 void Iterator<Type>::check_validity(int line) const {
-    if (this->index >= this->size)
+    if (this->index < 0 || this->index >= this->size) //
     {
         time_t currentTime = time(NULL);
         throw InvalidIterator(__FILE__, typeid(*this).name(), line, ctime(&currentTime));
@@ -238,7 +258,7 @@ void Iterator<Type>::check_validity(int line) const {
 template<typename Type>
 Type* Iterator<Type>::get_cur_ptr() const
 {
-    std::shared_ptr<Type> copy_ptr = weakPtr.lock();
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
     return copy_ptr.get() + index;
 }
 
