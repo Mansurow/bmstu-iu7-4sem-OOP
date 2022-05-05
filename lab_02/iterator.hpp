@@ -51,20 +51,13 @@ Type* Iterator<Type>::operator ->()
 template<typename Type>
 const Type* Iterator<Type>::operator ->() const
 {
-    check_object(__LINE__);
-    check_validity(__LINE__);
-
-    return get_cur_ptr();
+    return *(operator+(index));
 }
 
 template<typename Type>
 Type &Iterator<Type>::operator [](int index)
 {
-    check_object(__LINE__);
-    check_validity(__LINE__);
-
-    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
-    return copy_ptr.get() + index;
+    return *(operator+(index));
 }
 
 template<typename Type>

@@ -370,7 +370,7 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::mulNum(const U &num) const
 {
-    return (*this) * num;
+    return operator*(num);
 }
 
 template<typename Type>
@@ -389,8 +389,7 @@ Vector<Type> &Vector<Type>::operator *=(const Type &num)
 template<typename Type>
 Vector<Type> &Vector<Type>::mulNumEqual(const Type &num)
 {
-    (*this) *= num;
-    return *this;
+    return operator*=(num);
 }
 
 // Умножение элементов двух векторов
@@ -444,13 +443,13 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::mulElems(const Vector<U> & vector) const
 {
-    return (*this) ^ vector;
+    return operator^(vector);
 }
 
 template<typename Type>
 Vector<Type> &Vector<Type>::mulElemsEqual(const Vector<Type> &vector)
 {
-    return (*this) ^= vector;
+    return operator^=(vector);
 }
 
 // Скалярное произведение
@@ -464,44 +463,32 @@ decltype(auto) Vector<Type>::operator *(const Vector<U> &vector) const
 
     int maxLength = max(size, vector.size);
     Vector<decltype ((*this)[0] * vector[0])> newVector(maxLength);
-    newVector = newVector ^ vector;
+    newVector = (*this) ^ vector;
     return newVector.sumValue();
 }
 
 template<typename Type>
-Type &Vector<Type>::operator *=(const Vector<Type> &vector)
+Type Vector<Type>::operator *=(const Vector<Type> &vector)
 {
     time_t curTime = time(NULL);
     if (size <= 0 || vector.size <= 0)
         throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     (*this) ^= vector;
-    return sumValue();
+    return this->sumValue();
 }
 
 template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::scalarMul(const Vector<U> &vector) const
 {
-    time_t curTime = time(NULL);
-    if (size <= 0 || vector.getSize() <= 0)
-        EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
-
-    int maxLength = max(size, vector.getSize());
-    Vector<decltype ((*this)[0] * vector[0])> newVector(maxLength);
-    newVector = newVector ^ vector;
-    return newVector.sumValue();
+    return operator*(vector);
 }
 
 template<typename Type>
-Type &Vector<Type>::scalarMulEqual(const Vector<Type> &vector)
+Type Vector<Type>::scalarMulEqual(const Vector<Type> &vector)
 {
-    time_t curTime = time(NULL);
-    if (size <= 0 || vector.size <= 0)
-        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
-
-    (*this) ^= vector;
-    return sumValue();
+    return operator*=(vector);
 }
 
 // Векторное произведение
@@ -528,7 +515,7 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::vectorMul(const Vector<U> &vector) const
 {
-    return *this & vector;
+    return operator&(vector);
 }
 
 template<typename Type>
@@ -552,8 +539,7 @@ Vector<Type>& Vector<Type>::operator &=(const Vector<Type>& vector)
 template<typename Type>
 Vector<Type>& Vector<Type>::vectorMulEqual(const Vector<Type>& vector)
 {
-    *this &= vector;
-    return *this;
+    return operator&=(vector);
 }
 
 // Деление вектора на число
@@ -575,8 +561,7 @@ Vector<Type> &Vector<Type>::operator /=(const Type& number)
 template<typename Type>
 Vector<Type> &Vector<Type>::divNumEqual(const Type& number)
 {
-    (*this) /= number;
-    return *this;
+    return operator/=(number);
 }
 
 template<typename Type>
@@ -600,7 +585,7 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::divNum(const U& number) const
 {
-    return (*this) / number;
+    return operator/(number);
 }
 
 // Равны ли вектора.
@@ -695,7 +680,7 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::sum(const Vector<U> &vector) const
 {
-    return (*this) + vector;
+    return operator+(vector);
 }
 
 template<typename Type>
@@ -716,7 +701,55 @@ Vector<Type> &Vector<Type>::operator +=(const Vector<Type> &vector)
 template<typename Type>
 Vector<Type> &Vector<Type>::sumEqual(const Vector<Type> &vector)
 {
-     return (*this) += vector;
+     return operator+=(vector);
+}
+
+// Cумма вектора и числа
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::operator +(const U &number) const
+{
+    time_t curTime = time(NULL);
+    if (size <= 0)
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+    Vector<decltype((*this)[0] + number)> newVector(size);
+
+    Iterator<decltype((*this)[0] + number)> resIter(newVector);
+    Iterator<Type> fIter((*this));
+    for (int i = 0; resIter; i++, resIter++, fIter++)
+    {
+        *resIter = *fIter + number;
+    }
+    return newVector;
+}
+
+template<typename Type>
+ Vector<Type> &Vector<Type>::operator +=(const Type &number)
+ {
+     time_t curTime = time(NULL);
+     if (size <= 0)
+         throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+     Iterator<Type> fIter((*this));
+     for (int i = 0; fIter; i++, fIter++)
+     {
+         *fIter += number;
+     }
+     return (*this);
+ }
+
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::sumNum(const U &number) const
+{
+   return operator +(number);
+}
+
+template<typename Type>
+Vector<Type> &Vector<Type>::sumNumEqual(const Type &number)
+{
+    return operator+=(number);
 }
 
 // Разность векторов.
@@ -767,14 +800,63 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::sub(const Vector<U> &vector) const
 {
-    return (*this) - vector;
+    return operator-(vector);
 }
 
 template<typename Type>
 Vector<Type> &Vector<Type>::subEqual(const Vector<Type> &vector)
 {
-    return (*this) -= vector;
+    return operator-=(vector);
 }
+
+// Cумма вектора и числа
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::operator -(const U &number) const
+{
+    time_t curTime = time(NULL);
+    if (size <= 0)
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+    Vector<decltype((*this)[0] + number)> newVector(size);
+
+    Iterator<decltype((*this)[0] + number)> resIter(newVector);
+    Iterator<Type> fIter((*this));
+    for (int i = 0; resIter; i++, resIter++, fIter++)
+    {
+        *resIter = *fIter - number;
+    }
+    return newVector;
+}
+
+template<typename Type>
+ Vector<Type> &Vector<Type>::operator -=(const Type &number)
+ {
+     time_t curTime = time(NULL);
+     if (size <= 0)
+         throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+     Iterator<Type> fIter((*this));
+     for (int i = 0; fIter; i++, fIter++)
+     {
+         *fIter -= number;
+     }
+     return (*this);
+ }
+
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::subNum(const U &number) const
+{
+   return operator -(number);
+}
+
+template<typename Type>
+Vector<Type> &Vector<Type>::subNumEqual(const Type &number)
+{
+   return operator -=(number);
+}
+
 
 // Оператор вычитания - обратный вектор
 template<typename Type>
@@ -794,58 +876,9 @@ Vector<Type> Vector<Type>::operator -()
 template<typename Type>
 Vector<Type> Vector<Type>::reverse()
 {
-    return -(*this);
+    return operator-();
 }
 
-// Сумма двух векторов.
-template <typename Type>
-void Vector<Type>::vecSum(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const
-{
-    Iterator<Type> resIter(res);
-    Iterator<Type> fIter(fV);
-    Iterator<Type> sIter(sV);
-    for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
-    {
-        if (i < fV.size && i < sV.size)
-            *resIter = *fIter + *sIter;
-        else if (i >= fV.size)
-            *resIter = *fIter;
-        else
-            *resIter = *sIter;
-    }
-}
-
-// Разница двух векторов.
-template<typename Type>
-void Vector<Type>::vecSub(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const {
-    Iterator<Type> resIter(res);
-    Iterator<Type> fIter(fV);
-    Iterator<Type> sIter(sV);
-    for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
-    {
-        if (i < fV.size && i < sV.size)
-            *resIter = *fIter - *sIter;
-        else if (i >= fV.size)
-            *resIter = *fIter;
-        else
-            *resIter = -*sIter;
-    }
-}
-
-// Произведение двух векторов.
-template<typename Type>
-void Vector<Type>::vecMul(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const{
-    Iterator<Type> resIter(res);
-    Iterator<Type> fIter(fV);
-    Iterator<Type> sIter(sV);
-    for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
-    {
-        if (i < fV.size && i < sV.size)
-            *resIter = *fIter * *sIter;
-        else
-            *resIter = 0;
-    }
-}
 
 // Выделение памяти под новый вектор.
 template<typename Type>
@@ -876,7 +909,7 @@ template<typename Type>
 Iterator<Type> Vector<Type>::end() noexcept
 {
     Iterator<Type> iterator(*this);
-    return iterator + this->size;
+    return iterator + size;
 }
 
 template<typename Type>
@@ -890,6 +923,6 @@ template<typename Type>
 ConstIterator<Type> Vector<Type>::end() const noexcept
 {
     ConstIterator<Type> iterator(*this);
-    return iterator + this->vector_size;
+    return iterator + size;
 }
 #endif // VECTOR_HPP

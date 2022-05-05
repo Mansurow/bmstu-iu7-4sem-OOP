@@ -188,11 +188,7 @@ bool ConstIterator<Type>::operator !=(const ConstIterator<Type>& iterator) const
 template<typename Type>
 const Type &ConstIterator<Type>::operator [](int index) const
 {
-    check_object(__LINE__);
-    check_validity(__LINE__);
-
-    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
-    return copy_ptr.get() + index;
+    return *(operator+(index));
 }
 
 template<typename Type>

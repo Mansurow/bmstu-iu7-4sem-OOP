@@ -17,9 +17,7 @@
 
 using namespace std;
 // на каждый оператор сделать метод с соотвествующим название
-// умножение элементов вектора
-// умножение двух элементов вектора
-// так же с суммой
+// умножение элементов двух вектора
 template<typename Type>
 class Vector: public BaseVector
 {
@@ -49,7 +47,7 @@ public:
     const Type &operator [](int index) const;
 
     Type getLength() const;
-    int getSize() const noexcept override;
+    int  getSize() const noexcept override;
     bool isEmpty() const noexcept override;
 
     bool isZero() const; // проверка на нулевой вектор
@@ -60,25 +58,42 @@ public:
 
     Vector<Type> getSingle() const; // нормированием вектора
 
-    // Сумма двух векторов - DONE
+
+    // Сумма вектора и числа
+    template<typename U>
+    decltype(auto) operator +(const U &) const;
+    Vector<Type>  &operator +=(const Type &);
+    template<typename U>
+    decltype(auto) sumNum(const U &) const;
+    Vector<Type>  &sumNumEqual(const Type &);
+
+    // Сумма двух векторов
     template<typename U>
     decltype(auto) operator +(const Vector<U> &) const;
-     Vector<Type> &operator +=(const Vector<Type> &);
+    Vector<Type>  &operator +=(const Vector<Type> &);
     template<typename U>
     decltype(auto) sum(const Vector<U> &) const;
-     Vector<Type> &sumEqual(const Vector<Type> &);
+    Vector<Type>  &sumEqual(const Vector<Type> &);
 
-    // Разность двух векторов - Done
+    // Разность вектора и числа
+    template<typename U>
+    decltype(auto) operator -(const U &) const;
+    Vector<Type>  &operator -=(const Type &);
+    template<typename U>
+    decltype(auto) subNum(const U &) const;
+    Vector<Type>  &subNumEqual(const Type &);
+
+    // Разность двух векторов
     template<typename U>
     decltype(auto) operator -(const Vector<U> &) const;
-     Vector<Type> &operator -=(const Vector<Type> &);
+    Vector<Type>  &operator -=(const Vector<Type> &);
     template<typename U>
     decltype(auto) sub(const Vector<U> &) const;
-     Vector<Type> &subEqual(const Vector<Type> &);
+    Vector<Type>  &subEqual(const Vector<Type> &);
     Vector<Type> operator -();
     Vector<Type> reverse();
 
-    // Умножение на число - Done
+    // Умножение на число
     template<typename U>
     decltype(auto) operator *(const U &number) const;
     Vector<Type> &operator *=(const Type &number);
@@ -86,7 +101,7 @@ public:
     decltype(auto) mulNum(const U &number) const;
     Vector<Type> &mulNumEqual(const Type &number);
 
-    //Умножение элементов двух веткоров - DONE
+    //Умножение элементов двух веткоров
     template<typename U>
     decltype(auto) operator ^(const Vector<U> &) const;
     Vector<Type> &operator ^=(const Vector<Type>&);
@@ -97,12 +112,12 @@ public:
     // Скалярное произведение
     template<typename U>
     decltype(auto) operator *(const Vector<U> &) const;
-             Type &operator *=(const Vector<Type> &);
+             Type  operator *=(const Vector<Type> &);
     template<typename U>
     decltype(auto) scalarMul(const Vector<U> &) const;
-             Type &scalarMulEqual(const Vector<Type> &);
+             Type  scalarMulEqual(const Vector<Type> &);
 
-    // Векторное произведение - Done
+    // Векторное произведение
     template<typename U>
     decltype(auto) operator &(const Vector<U> &) const;
      Vector<Type> &operator &=(const Vector<Type> &);
@@ -122,6 +137,7 @@ public:
     bool operator ==(const Vector<Type> &) const;
     bool operator !=(const Vector<Type> &) const;
 
+    // угол между векторами
     double angleBetweenVectors(const Vector<Type>&) const;
 
     Iterator<Type> begin() noexcept;
@@ -134,10 +150,6 @@ public:
 
 protected:
     Type sumValue();
-    void vecSum(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const;
-    void vecSub(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const;
-    void vecMul(Vector<Type> &res, const Vector<Type> &fV, const Vector<Type> &sV) const;
-
     void allocNewVectorMem(int amount);
 private:
     shared_ptr<Type[]> values; // Type[] - передача болле сложных типов (классов, объектов)
