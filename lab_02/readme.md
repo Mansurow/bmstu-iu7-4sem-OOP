@@ -23,6 +23,10 @@
 
 Консольнео приложение.
 
-![image](https://user-images.githubusercontent.com/62243773/165917844-4a2554b1-5c41-4a78-b1fc-4c3906e1055d.png)
+![image](https://user-images.githubusercontent.com/62243773/167014987-87743f11-d2ec-49a3-a8b2-69e5a0af000a.png)
+![image](https://user-images.githubusercontent.com/62243773/167015047-edeb5e2a-581e-44b6-b5dc-c9bfb081ea30.png)
+![image](https://user-images.githubusercontent.com/62243773/167015095-545296b3-3aca-4473-8c8c-3432066d1c34.png)
+
+# Документация - чуть позже
 
 
