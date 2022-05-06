@@ -8,12 +8,10 @@
 #include <memory>
 #include <stdexcept>
 
-#include "base_vector.h"
-#include "iterator.hpp"
-#include "const_iterator.h"
-#include "errors.h"
-
-#define EPS 1e-8
+#include "/Vector/base_vector.h"
+#include "/Iterator/iterator.hpp"
+#include "/Iterator/const_iterator.h"
+#include "/Exception/errors.h"
 
 using namespace std;
 

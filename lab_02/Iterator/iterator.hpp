@@ -1,11 +1,11 @@
-#ifndef CONST_ITERATOR_HPP
-#define CONST_ITERATOR_HPP
+#ifndef ITERATOR_HPP
+#define ITERATOR_HPP
 
-#include <const_iterator.h>
+#include </iterator/iterator.h>
 
 // конструктор копирования итератора
 template<typename Type>
-ConstIterator<Type>::ConstIterator(const ConstIterator<Type>& iterator)
+Iterator<Type>::Iterator(const Iterator<Type>& iterator)
 {
     this->weakPtr = iterator.weakPtr;
     this->index = iterator.index;
@@ -13,7 +13,7 @@ ConstIterator<Type>::ConstIterator(const ConstIterator<Type>& iterator)
 }
 
 template<typename Type>
-ConstIterator<Type>::ConstIterator(const Vector<Type>& vector)
+Iterator<Type>::Iterator(const Vector<Type>& vector)
 {
     this->index = 0;
     this->size = vector.getSize();
@@ -22,7 +22,7 @@ ConstIterator<Type>::ConstIterator(const Vector<Type>& vector)
 
 // операторы разыменования
 template<typename Type>
-const Type& ConstIterator<Type>::operator *() const
+Type& Iterator<Type>::operator *()
 {
     check_object(__LINE__);
     check_validity(__LINE__);
@@ -31,7 +31,16 @@ const Type& ConstIterator<Type>::operator *() const
 }
 
 template<typename Type>
-const Type* ConstIterator<Type>::operator ->() const
+const Type& Iterator<Type>::operator *() const
+{
+    check_object(__LINE__);
+    check_validity(__LINE__);
+
+    return *get_cur_ptr();
+}
+
+template<typename Type>
+Type* Iterator<Type>::operator ->()
 {
     check_object(__LINE__);
     check_validity(__LINE__);
@@ -39,9 +48,31 @@ const Type* ConstIterator<Type>::operator ->() const
     return get_cur_ptr();
 }
 
+template<typename Type>
+const Type* Iterator<Type>::operator ->() const
+{
+    return *(operator+(index));
+}
+
+template<typename Type>
+Type &Iterator<Type>::operator [](int index)
+{
+    return *(operator+(index));
+}
+
+template<typename Type>
+const Type &Iterator<Type>::operator [](int index) const
+{
+    check_object(__LINE__);
+    check_validity(__LINE__);
+
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
+    return copy_ptr.get() + index;
+}
+
 // операция присваивания
 template<typename Type>
-ConstIterator<Type>& ConstIterator<Type>::operator =(const ConstIterator<Type>& iterator)
+Iterator<Type>& Iterator<Type>::operator =(const Iterator<Type>& iterator)
 {
     iterator.check_object(__LINE__);
 
@@ -54,7 +85,7 @@ ConstIterator<Type>& ConstIterator<Type>::operator =(const ConstIterator<Type>& 
 
 // операции сложения
 template<typename Type>
-ConstIterator<Type>& ConstIterator<Type>::operator +=(int number)
+Iterator<Type>& Iterator<Type>::operator +=(int number)
 {
     check_object(__LINE__);
     index += number;
@@ -63,10 +94,10 @@ ConstIterator<Type>& ConstIterator<Type>::operator +=(int number)
 }
 
 template<typename Type>
-ConstIterator<Type> ConstIterator<Type>::operator +(int number) const
+Iterator<Type> Iterator<Type>::operator +(int number) const
 {
     check_object(__LINE__);
-    ConstIterator<Type> iterator(*this);
+    Iterator<Type> iterator(*this);
     if (index + number <= size)
         iterator += number;
 
@@ -74,7 +105,7 @@ ConstIterator<Type> ConstIterator<Type>::operator +(int number) const
 }
 
 template<typename Type>
-ConstIterator<Type> ConstIterator<Type>::operator ++(int)
+Iterator<Type> Iterator<Type>::operator ++(int)
 {
     check_object(__LINE__);
     if (index < size)
@@ -84,7 +115,7 @@ ConstIterator<Type> ConstIterator<Type>::operator ++(int)
 }
 
 template<typename Type>
-ConstIterator<Type>& ConstIterator<Type>::operator ++()
+Iterator<Type>& Iterator<Type>::operator ++()
 {
     check_object(__LINE__);
     if (index < size)
@@ -95,7 +126,7 @@ ConstIterator<Type>& ConstIterator<Type>::operator ++()
 
 // операции вычитания
 template<typename Type>
-ConstIterator<Type>& ConstIterator<Type>::operator -=(int number)
+Iterator<Type>& Iterator<Type>::operator -=(int number)
 {
     check_object(__LINE__);
     if (index >= number - 1)
@@ -105,11 +136,11 @@ ConstIterator<Type>& ConstIterator<Type>::operator -=(int number)
 }
 
 template<typename Type>
-ConstIterator<Type> ConstIterator<Type>::operator -(int number) const
+Iterator<Type> Iterator<Type>::operator -(int number) const
 {
     check_object(__LINE__);
 
-    ConstIterator<Type> iterator(*this);
+    Iterator<Type> iterator(*this);
     if (index >= number - 1)
         iterator -= number;
 
@@ -117,7 +148,7 @@ ConstIterator<Type> ConstIterator<Type>::operator -(int number) const
 }
 
 template<typename Type>
-ConstIterator<Type> ConstIterator<Type>::operator --(int)
+Iterator<Type> Iterator<Type>::operator --(int)
 {
     check_object(__LINE__);
     if (index >= 0)
@@ -127,7 +158,7 @@ ConstIterator<Type> ConstIterator<Type>::operator --(int)
 }
 
 template<typename Type>
-ConstIterator<Type>& ConstIterator<Type>::operator --()
+Iterator<Type>& Iterator<Type>::operator --()
 {
     check_object(__LINE__);
     if (index >= 0)
@@ -138,7 +169,7 @@ ConstIterator<Type>& ConstIterator<Type>::operator --()
 
 // логические операции
 template<typename Type>
-bool ConstIterator<Type>::operator <=(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator <=(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -146,7 +177,7 @@ bool ConstIterator<Type>::operator <=(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
-bool ConstIterator<Type>::operator <(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator <(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -154,7 +185,7 @@ bool ConstIterator<Type>::operator <(const ConstIterator<Type>& iterator) const
 }
 
 template<class Type>
-bool ConstIterator<Type>::operator >=(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator >=(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -162,7 +193,7 @@ bool ConstIterator<Type>::operator >=(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
-bool ConstIterator<Type>::operator >(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator >(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -170,7 +201,7 @@ bool ConstIterator<Type>::operator >(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
-bool ConstIterator<Type>::operator ==(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator ==(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -178,7 +209,7 @@ bool ConstIterator<Type>::operator ==(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
-bool ConstIterator<Type>::operator !=(const ConstIterator<Type>& iterator) const
+bool Iterator<Type>::operator !=(const Iterator<Type>& iterator) const
 {
     check_object(__LINE__);
 
@@ -186,13 +217,7 @@ bool ConstIterator<Type>::operator !=(const ConstIterator<Type>& iterator) const
 }
 
 template<typename Type>
-const Type &ConstIterator<Type>::operator [](int index) const
-{
-    return *(operator+(index));
-}
-
-template<typename Type>
-ConstIterator<Type>::operator bool() const
+Iterator<Type>::operator bool() const
 {
     check_object(__LINE__);
     bool res = true;
@@ -204,7 +229,7 @@ ConstIterator<Type>::operator bool() const
 
 // проверки работы с объектом и итератором
 template<typename Type>
-void ConstIterator<Type>::check_object(int line) const
+void Iterator<Type>::check_object(int line) const
 {
     if (weakPtr.expired())
     {
@@ -214,8 +239,8 @@ void ConstIterator<Type>::check_object(int line) const
 }
 
 template<typename Type>
-void ConstIterator<Type>::check_validity(int line) const {
-    if (this->index < 0 || this->index >= this->size)
+void Iterator<Type>::check_validity(int line) const {
+    if (this->index < 0 || this->index >= this->size) //
     {
         time_t currentTime = time(NULL);
         throw InvalidIterator(__FILE__, typeid(*this).name(), line, ctime(&currentTime));
@@ -224,11 +249,10 @@ void ConstIterator<Type>::check_validity(int line) const {
 
 // достать текущий указатель на объект
 template<typename Type>
-Type* ConstIterator<Type>::get_cur_ptr() const
+Type* Iterator<Type>::get_cur_ptr() const
 {
-    std::shared_ptr<Type> copy_ptr = weakPtr.lock();
+    std::shared_ptr<Type[]> copy_ptr = weakPtr.lock();
     return copy_ptr.get() + index;
 }
 
-
-#endif // CONST_ITERATOR_HPP
+#endif // ITERATOR_HPP

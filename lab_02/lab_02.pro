@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++22
+CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -7,12 +7,12 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    base_iterator.h \
-    base_vector.h \
-    const_iterator.h \
-    const_iterator.hpp \
-    errors.h \
-    iterator.h \
-    iterator.hpp \
-    vector.h \
-    vector.hpp
+    $$PWD/Iterator/base_iterator.h \
+    $$PWD/Vector/base_vector.h \
+    $$PWD/Iterator/const_iterator.h \
+    $$PWD/Iterator/const_iterator.hpp \
+    $$PWD/Exception/errors.h \
+    $$PWD/Iterator/iterator.h \
+    $$PWD/Iterator/iterator.hpp \
+    $$PWD/Vector/vector.h \
+    $$PWD/Vector/vector.hpp

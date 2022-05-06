@@ -1,7 +1,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <vector.h>
+#include </Vector/vector.h>
 
 // Конструктор инициализации.
 template<typename Type>
@@ -354,12 +354,12 @@ decltype(auto) Vector<Type>::operator *(const U &num) const
     if (size <= 0)
         EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
-    Vector<decltype((*this)[0] * num)> new_vector(*this);
-    Iterator<Type> iterator(new_vector);
+    Vector<decltype((*this)[0] * num)> newVector(*this);
+    Iterator<Type> iterator(newVector);
     for (; iterator; iterator++)
         *iterator *= num;
 
-    return new_vector;
+    return newVector;
 }
 
 template<typename Type>
@@ -550,22 +550,66 @@ decltype(auto) Vector<Type>::operator /(const Vector<U>& vector) const
 {
     time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+    Vector<decltype((*this)[0] + vector[0])> newVector(size);
+
+    Iterator<decltype((*this)[0] + vector[0])> resIter(newVector);
+    Iterator<Type> fIter((*this));
+    Iterator<U> sIter(vector);
+
+    for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
+    {
+        if (fabs(*sIter) < __DBL_EPSILON__)
+        {
+            curTime = time(NULL);
+            throw ZeroDivError (__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+        }
+        *resIter = *fIter / *sIter;
+    }
+
+    return newVector;
+}
+
+template<typename Type>
+Vector<Type> &Vector<Type>::operator /=(const Vector<Type>& vector)
+{
+    time_t curTime = time(NULL);
+    if (size <= 0 || vector.getSize() <= 0)
         EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
     if (size != vector.getSize())
         throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
+    Iterator<Type> fIter((*this));
+    Iterator<Type> sIter(vector);
 
+    for (int i = 0; fIter; i++, fIter++, sIter++)
+    {
+        if (fabs(*sIter) < __DBL_EPSILON__)
+        {
+            curTime = time(NULL);
+            throw ZeroDivError (__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+        }
+        *fIter /= *sIter;
+    }
+
+    return *this;
 }
 
 template<typename Type>
-Vector<Type> &Vector<Type>::operator /=(const Vector<Type>&);
-
-template<typename Type>
 template<typename U>
-decltype(auto) Vector<Type>::div(const Vector<U>&) const;
+decltype(auto) Vector<Type>::div(const Vector<U>& vector) const
+{
+    return operator/(vector);
+}
 
 template<typename Type>
-Vector<Type> &Vector<Type>::divEqual(const Vector<Type>&);
+Vector<Type> &Vector<Type>::divEqual(const Vector<Type>& vector)
+{
+    return operator/=(vector);
+}
 
 // Деление вектора на число
 template<typename Type>
@@ -691,9 +735,8 @@ decltype(auto) Vector<Type>::operator +(const Vector<U> &vector) const
     Iterator<Type> fIter((*this));
     Iterator<U> sIter(vector);
     for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
-    {
         *resIter = *fIter + *sIter;
-    }
+
     return newVector;
 }
 
@@ -741,9 +784,8 @@ decltype(auto) Vector<Type>::operator +(const U &number) const
     Iterator<decltype((*this)[0] + number)> resIter(newVector);
     Iterator<Type> fIter((*this));
     for (int i = 0; resIter; i++, resIter++, fIter++)
-    {
         *resIter = *fIter + number;
-    }
+
     return newVector;
 }
 
@@ -756,9 +798,8 @@ template<typename Type>
 
      Iterator<Type> fIter((*this));
      for (int i = 0; fIter; i++, fIter++)
-     {
          *fIter += number;
-     }
+
      return (*this);
  }
 
@@ -792,9 +833,7 @@ decltype(auto) Vector<Type>::operator -(const Vector<U> &vector) const
     Iterator<U> sIter(vector);
 
     for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
-    {
         *resIter = *fIter - *sIter;
-    }
 
     return newVector;
 }
@@ -844,9 +883,8 @@ decltype(auto) Vector<Type>::operator -(const U &number) const
     Iterator<decltype((*this)[0] + number)> resIter(newVector);
     Iterator<Type> fIter((*this));
     for (int i = 0; resIter; i++, resIter++, fIter++)
-    {
         *resIter = *fIter - number;
-    }
+
     return newVector;
 }
 
@@ -859,9 +897,8 @@ template<typename Type>
 
      Iterator<Type> fIter((*this));
      for (int i = 0; fIter; i++, fIter++)
-     {
          *fIter -= number;
-     }
+
      return (*this);
  }
 
@@ -891,6 +928,7 @@ Vector<Type> Vector<Type>::operator -()
     Iterator<Type> iterator(newVector);
     for (; iterator; iterator++)
         *iterator = -*iterator;
+
     return newVector;
 }
 

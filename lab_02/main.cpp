@@ -12,10 +12,6 @@ int main()
     Vector<double> lenFillExample(3, 6.66, 7.5, 8.6);
     Vector<double> emptyVector(0);
 
-    Vector<double> v1 ={1, 2, 3};
-    Vector<double> v2 ={4, 5, 6};
-    cout << v1 + v2 << endl;
-
     cout << "---------------Vectors Construction-------------" << endl;
     cout<< "  Vector with initialization: "<< initializing<< endl;
     cout<< "  Vector with a given length "<< lenExample<< endl;
@@ -23,9 +19,9 @@ int main()
 
     cout<< "Empty vector: "<< emptyVector<< endl;
 
-    Vector<int> operVecF = {4, 2, 4};
-    Vector<int> operVecS = {3, 1, 5};
-    Vector<double> oper = {1.0, 2.0, 1.0};
+    Vector<double> operVecF = {4, 2, 4};
+    Vector<double> operVecS = {3, 1, 5};
+
     cout << "---------------Vectors checks-------------" << endl;
     cout<< "   Normalization of the vector: "<< operVecS << "=>" << operVecS.getSingle() << endl;
     cout<< "   Size vector: " << initializing << " => " << initializing.getSize()<< endl;
@@ -104,12 +100,21 @@ int main()
 
     operVecF = {4, 2, 4};
 
-    cout << "6. Div vector and number:" << endl;
+    cout << "7. Div vector and number:" << endl;
     int divNum = 2;
     cout << "   Vectors /: "<< operVecF << " / " <<  divNum << " = " << operVecF / divNum << endl;
     cout << "   Vectors /: "<< operVecF << ".divNum(" <<  divNum << ") = " << operVecF.divNum(divNum) << endl;
     cout << "   Vectors /=: "<< operVecF << " /= " <<  divNum << " => " << (operVecF /= divNum) << endl;
     cout << "   Vectors /=: "<< operVecF << ".divNumEqual(" <<  divNum << ") => " << operVecF.divNumEqual(divNum) << endl;
+
+    operVecF = {4, 2, 4};
+
+    cout << "8. Div vectorsr:" << endl;
+
+    cout << "   Vectors /: "<< operVecF << " / " <<  operVecS << " = " << operVecF / operVecS << endl;
+    cout << "   Vectors /: "<< operVecF << ".div(" << operVecS << ") = " << operVecF.div(operVecS) << endl;
+    cout << "   Vectors /=: "<< operVecF << " /= " <<  operVecS << " => " << (operVecF /= operVecS) << endl;
+    cout << "   Vectors /=: "<< operVecF << ".divEqual(" <<  operVecS << ") => " << operVecF.divEqual(operVecS) << endl;
 
     cout << "---------------Vectors checks-------------" << endl;
     Vector<float> orthVecF = {1, 0, 0};
@@ -124,7 +129,7 @@ int main()
 
     cout<< "  Collinearity: "<< colVecF.isCollinear(colVecS)<< endl;
     colVecF = {5, 2, 0};
-    cout<< "  Not collinearity: "<< colVecF.isCollinear(operVecS)<< endl;
+    cout<< "  Not collinearity: "<< colVecF.isCollinear(colVecS)<< endl;
 
 
     cout << "---------------Vectors Errors-------------" << endl;
