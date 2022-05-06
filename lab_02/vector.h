@@ -16,8 +16,7 @@
 #define EPS 1e-8
 
 using namespace std;
-// на каждый оператор сделать метод с соотвествующим название
-// умножение элементов двух вектора
+
 template<typename Type>
 class Vector: public BaseVector
 {
@@ -31,7 +30,7 @@ public:
     Vector(int len, Type vector, ...);
     Vector(initializer_list<Type> args);
     explicit Vector(const Vector<Type> &vector);
-    Vector(Vector<Type>&& vector);
+    Vector(Vector<Type>&& vector) noexcept;
 
     virtual ~Vector();
 
@@ -111,11 +110,11 @@ public:
 
     // Скалярное произведение
     template<typename U>
-    decltype(auto) operator *(const Vector<U> &) const;
-             Type  operator *=(const Vector<Type> &);
+    auto operator *(const Vector<U> &) const;
+    Type  operator *=(const Vector<Type> &);
     template<typename U>
-    decltype(auto) scalarMul(const Vector<U> &) const;
-             Type  scalarMulEqual(const Vector<Type> &);
+    auto scalarMul(const Vector<U> &) const;
+    Type  scalarMulEqual(const Vector<Type> &);
 
     // Векторное произведение
     template<typename U>
@@ -125,13 +124,21 @@ public:
     decltype(auto) vectorMul(const Vector<U> &) const;
      Vector<Type> &vectorMulEqual(const Vector<Type> &);
 
-    // Деление вектора на число - Done
+    // Деление вектора на число
     template<typename U>
     decltype(auto) operator /(const U& number) const;
-     Vector<Type> &operator /=(const Type& number);
+    Vector<Type>  &operator /=(const Type& number);
     template<typename U>
-    decltype(auto) divNum(const U& number) const;
-     Vector<Type> &divNumEqual(const Type& number);
+    decltype(auto) divNum(const U&) const;
+    Vector<Type>  &divNumEqual(const Type& number);
+
+    // Деление двух векторов
+    template<typename U>
+    decltype(auto) operator /(const Vector<U>&) const;
+    Vector<Type>  &operator /=(const Vector<Type>&);
+    template<typename U>
+    decltype(auto) div(const Vector<U>&) const;
+    Vector<Type>  &divEqual(const Vector<Type>&);
 
     // Логические операции
     bool operator ==(const Vector<Type> &) const;

@@ -1,8 +1,6 @@
 #ifndef BASE_VECTOR_H
 #define BASE_VECTOR_H
 
-#include<iostream>
-
 class BaseVector
 {
 public:

@@ -17,7 +17,7 @@ Vector<Type>::Vector(int len)
 {
     time_t curTime = time(NULL);
     if (len < 0)
-        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime)); // возможно создать другое иск   лючение
 
     size = len;
     allocNewVectorMem(size);
@@ -100,7 +100,7 @@ Vector<Type>::Vector(std::initializer_list<Type> args)
 
 // Конструктор от вектора.
 template<typename Type>
-Vector<Type>:: Vector(const Vector<Type> &vector)
+Vector<Type>::Vector(const Vector<Type> &vector)
 {
     time_t currentTime = time(NULL);
     size = vector.size;
@@ -116,14 +116,10 @@ Vector<Type>:: Vector(const Vector<Type> &vector)
 
 // Конструктор переносом.
 template<typename Type>
-Vector<Type>:: Vector(Vector<Type> &&vector)
+Vector<Type>:: Vector(Vector<Type> &&vector) noexcept
 {
-    time_t currentTime = time(NULL);
-
     size = vector.size;
     allocNewVectorMem(size);
-    if (!values)
-        throw MemoryError(__FILE__, typeid(*this).name(), __LINE__, ctime(&currentTime));
     values = vector.values;
     vector.values = nullptr;
 }
@@ -399,20 +395,19 @@ decltype(auto) Vector<Type>::operator ^(const Vector<U> &vector) const
 {
     time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
-            throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
-    int maxLength = max(size, vector.getSize());
-    Vector<decltype((*this)[0] * vector[0])> newVector(maxLength);
+    Vector<decltype((*this)[0] * vector[0])> newVector(size);
+
     Iterator<decltype((*this)[0] * vector[0])> resIter(newVector);
     Iterator<Type> fIter(*this);
     Iterator<U> sIter(vector);
 
     for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
     {
-        if (i < size && i < vector.getSize())
-            *resIter = *fIter * *sIter;
-        else
-            *resIter = 0;
+        *resIter = *fIter * *sIter;
     }
 
     return newVector;
@@ -423,17 +418,16 @@ Vector<Type> &Vector<Type>::operator ^=(const Vector<Type> &vector)
 {
     time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
-            throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     Iterator<Type> fIter(*this);
     Iterator<Type> sIter(vector);
 
     for (int i = 0; fIter; i++, fIter++, sIter++)
     {
-        if (i < size && i < vector.getSize())
-            *fIter = *fIter * *sIter;
-        else
-            *fIter = 0;
+        *fIter = *fIter * *sIter;
     }
 
     return (*this);
@@ -455,14 +449,15 @@ Vector<Type> &Vector<Type>::mulElemsEqual(const Vector<Type> &vector)
 // Скалярное произведение
 template<typename Type>
 template<typename U>
-decltype(auto) Vector<Type>::operator *(const Vector<U> &vector) const
+auto Vector<Type>::operator *(const Vector<U> &vector) const
 {
     time_t curTime = time(NULL);
     if (size <= 0 || vector.size <= 0)
         EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
-    int maxLength = max(size, vector.size);
-    Vector<decltype ((*this)[0] * vector[0])> newVector(maxLength);
+    Vector<decltype ((*this)[0] * vector[0])> newVector(size);
     newVector = (*this) ^ vector;
     return newVector.sumValue();
 }
@@ -473,6 +468,8 @@ Type Vector<Type>::operator *=(const Vector<Type> &vector)
     time_t curTime = time(NULL);
     if (size <= 0 || vector.size <= 0)
         throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     (*this) ^= vector;
     return this->sumValue();
@@ -480,7 +477,7 @@ Type Vector<Type>::operator *=(const Vector<Type> &vector)
 
 template<typename Type>
 template<typename U>
-decltype(auto) Vector<Type>::scalarMul(const Vector<U> &vector) const
+auto Vector<Type>::scalarMul(const Vector<U> &vector) const
 {
     return operator*(vector);
 }
@@ -499,6 +496,8 @@ decltype(auto) Vector<Type>::operator &(const Vector<U> &vector) const
     time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
         EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     if (size != 3)
         return Vector<Type>();
@@ -524,13 +523,15 @@ Vector<Type>& Vector<Type>::operator &=(const Vector<Type>& vector)
     time_t curTime = time(NULL);
     if (size <= 0 || vector.size <= 0)
         EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     if (size != 3)
         return *(new Vector<Type>);
 
-    Type x = values.get()[1] * vector.values.get()[2] - values.get()[2] * vector.values.get()[1];
-    Type y = values.get()[2] * vector.values.get()[0] - values.get()[0] * vector.values.get()[2];
-    Type z = values.get()[0] * vector.values.get()[1] - values.get()[1] * vector.values.get()[0];
+    Type x = (*this)[1] * vector[2] - (*this)[2] * vector[1];
+    Type y = (*this)[2] * vector[0] - (*this)[0] * vector[2];
+    Type z = (*this)[0] * vector[1] - (*this)[1] * vector[0];
 
     *this = Vector<Type>(3, x, y, z);
     return *this;
@@ -541,6 +542,30 @@ Vector<Type>& Vector<Type>::vectorMulEqual(const Vector<Type>& vector)
 {
     return operator&=(vector);
 }
+
+// Деление двух векторов
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::operator /(const Vector<U>& vector) const
+{
+    time_t curTime = time(NULL);
+    if (size <= 0 || vector.getSize() <= 0)
+        EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+
+
+}
+
+template<typename Type>
+Vector<Type> &Vector<Type>::operator /=(const Vector<Type>&);
+
+template<typename Type>
+template<typename U>
+decltype(auto) Vector<Type>::div(const Vector<U>&) const;
+
+template<typename Type>
+Vector<Type> &Vector<Type>::divEqual(const Vector<Type>&);
 
 // Деление вектора на число
 template<typename Type>
@@ -587,6 +612,7 @@ decltype(auto) Vector<Type>::divNum(const U& number) const
 {
     return operator/(number);
 }
+
 
 // Равны ли вектора.
 template<typename Type>
@@ -656,22 +682,17 @@ decltype(auto) Vector<Type>::operator +(const Vector<U> &vector) const
     time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
         throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
-    int maxLength = max(size, vector.getSize());
-
-    Vector<decltype((*this)[0] + vector[0])> newVector(maxLength);
+    Vector<decltype((*this)[0] + vector[0])> newVector(size);
 
     Iterator<decltype((*this)[0] + vector[0])> resIter(newVector);
     Iterator<Type> fIter((*this));
     Iterator<U> sIter(vector);
     for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
     {
-        if (i < size && i < vector.getSize())
-            *resIter = *fIter + *sIter;
-        else if (i >= size)
-            *resIter = *fIter;
-        else
-            *resIter = *sIter;
+        *resIter = *fIter + *sIter;
     }
     return newVector;
 }
@@ -686,9 +707,11 @@ decltype(auto) Vector<Type>::sum(const Vector<U> &vector) const
 template<typename Type>
 Vector<Type> &Vector<Type>::operator +=(const Vector<Type> &vector)
 {
-    time_t currentTime = time(NULL);
-    if (size <= 0 || vector.size <= 0)
-        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&currentTime));\
+    time_t curTime = time(NULL);
+    if (size <= 0 || vector.getSize() <= 0)
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     Iterator<Type> fIter((*this));
     Iterator<Type> sIter(vector);
@@ -757,24 +780,20 @@ template<typename Type>
 template<typename U>
 decltype(auto) Vector<Type>::operator -(const Vector<U> &vector) const
 {
-    time_t currentTime = time(NULL);
+    time_t curTime = time(NULL);
     if (size <= 0 || vector.getSize() <= 0)
-        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&currentTime));
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
-    int maxLength = std::max(size, vector.getSize());
-    Vector<decltype((*this)[0] - vector[0])> newVector(maxLength);
+    Vector<decltype((*this)[0] - vector[0])> newVector(size);
     Iterator<decltype((*this)[0] - vector[0])> resIter(newVector);
     Iterator<Type> fIter((*this));
     Iterator<U> sIter(vector);
 
     for (int i = 0; resIter; i++, resIter++, fIter++, sIter++)
     {
-        if (i < size && i < vector.getSize())
-            *resIter = *fIter - *sIter;
-        else if (i >= size)
-            *resIter = *fIter;
-        else
-            *resIter = -*sIter;
+        *resIter = *fIter - *sIter;
     }
 
     return newVector;
@@ -783,9 +802,11 @@ decltype(auto) Vector<Type>::operator -(const Vector<U> &vector) const
 template<typename Type>
 Vector<Type> &Vector<Type>::operator -=(const Vector<Type> &vector)
 {
-    time_t currentTime = time(NULL);
-    if (size <= 0 || vector.size <= 0)
-        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&currentTime));
+    time_t curTime = time(NULL);
+    if (size <= 0 || vector.getSize() <= 0)
+        throw EmptyVectorError(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
+    if (size != vector.getSize())
+        throw DifferentSizeVectors(__FILE__, typeid(*this).name(), __LINE__, ctime(&curTime));
 
     Iterator<Type> fIter((*this));
     Iterator<Type> sIter(vector);

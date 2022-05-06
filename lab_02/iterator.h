@@ -46,7 +46,7 @@ public:
    bool operator >(const Iterator<Type>& iterator) const;
    bool operator ==(const Iterator<Type>& iterator) const;
    bool operator !=(const Iterator<Type>& iterator) const;
- // []
+
 protected:
     Type* get_cur_ptr() const;
 

@@ -111,4 +111,15 @@ public:
     BaseError(filename, classname, line, time, info) {};
 };
 
+class DifferentSizeVectors: public BaseError
+{
+public:
+    DifferentSizeVectors(std::string filename,
+                 std::string classname,
+                 int line,
+                 const char *time,
+                 std::string info = "The Vectors are different size!\n") :
+    BaseError(filename, classname, line, time, info) {};
+};
+
 #endif // ERRORS_H

@@ -12,6 +12,10 @@ int main()
     Vector<double> lenFillExample(3, 6.66, 7.5, 8.6);
     Vector<double> emptyVector(0);
 
+    Vector<double> v1 ={1, 2, 3};
+    Vector<double> v2 ={4, 5, 6};
+    cout << v1 + v2 << endl;
+
     cout << "---------------Vectors Construction-------------" << endl;
     cout<< "  Vector with initialization: "<< initializing<< endl;
     cout<< "  Vector with a given length "<< lenExample<< endl;
