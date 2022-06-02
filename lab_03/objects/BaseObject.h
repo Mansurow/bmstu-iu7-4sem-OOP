@@ -7,7 +7,6 @@
 
 #include <Point.h>
 
-
 class BaseObject;
 
 using Iterator = std::vector<std::shared_ptr<BaseObject>>::iterator;
@@ -42,6 +41,8 @@ public:
 protected:
     std::size_t _id;
     static std::size_t _nextId;
+
+    Point _center;
 };
 
 #endif //BASEOBJECT_H

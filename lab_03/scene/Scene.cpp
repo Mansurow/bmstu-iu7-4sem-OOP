@@ -17,9 +17,9 @@ std::size_t Scene::addObject(const std::shared_ptr<BaseObject> &object)
     return object->getId();
 }
 
-std::size_t Scene::addCamera(const Point &location)
+std::size_t Scene::addCamera(const Point &location, const Point &direction)
 {
-    auto camera = std::make_shared<Camera>(Camera(location));
+    auto camera = std::make_shared<Camera>(Camera(location, direction));
     _invisibleObjects->add(camera);
 
     return camera->getId();

@@ -18,7 +18,8 @@ std::shared_ptr<Camera> FileCameraDirector::load(std::shared_ptr<BaseCameraBuild
 
     builder->build();
     Point location = _loader->loadPoint();
-    builder->buildLocation(location);
+    Point direction = _loader->loadPoint();
+    builder->buildLocation(location, direction);
 
     _loader->close();
 

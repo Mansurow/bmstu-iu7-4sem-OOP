@@ -17,8 +17,9 @@ public:
     std::shared_ptr<Scene> getScene() const;
     std::shared_ptr<Camera> getCamera() const;
     std::shared_ptr<BaseObject> getObject(const size_t id) { return _scene->getObject(id); };
+    std::shared_ptr<Composite> getVisibleObjects() { return _scene->getVisibleObjects(); };
 
-    size_t addCamera(const Point &location) { return _scene->addCamera(location); };
+    size_t addCamera(const Point &location, const Point &direction) { return _scene->addCamera(location, direction); };
 
     size_t addObject(const shared_ptr<BaseObject> &object)
     {
@@ -31,7 +32,7 @@ public:
         _scene->deleteObject(objIt);
     };
 
-    void setScene(std::shared_ptr<Scene> scene);
+    void setScene(std::shared_ptr<Scene> &scene);
     void setCamera(const std::size_t id);
 
 private:

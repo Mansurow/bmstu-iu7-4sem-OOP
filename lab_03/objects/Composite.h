@@ -29,7 +29,6 @@ public:
     virtual Iterator end() override;
 
 private:
-    Point _center;
     std::vector<std::shared_ptr<BaseObject>> _elements;
 };
 

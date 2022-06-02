@@ -1,5 +1,5 @@
 #include <utility>
-#include "scenemanager.h"
+#include "SceneManager.h"
 
 
 SceneManager::SceneManager()
@@ -20,7 +20,7 @@ std::shared_ptr<Camera> SceneManager::getCamera() const
 }
 
 
-void SceneManager::setScene(std::shared_ptr<Scene> scene)
+void SceneManager::setScene(std::shared_ptr<Scene> &scene)
 {
     _scene = std::move(scene);
 }

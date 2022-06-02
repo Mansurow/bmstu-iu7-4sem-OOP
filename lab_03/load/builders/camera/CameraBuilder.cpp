@@ -5,9 +5,9 @@ void CameraBuilder::build()
     _camera = std::make_shared<Camera>();
 }
 
-void CameraBuilder::buildLocation(const Point &location)
+void CameraBuilder::buildLocation(const Point &location, const Point &direction)
 {
-    _camera = std::make_shared<Camera>(Camera(location));
+    _camera = std::make_shared<Camera>(Camera(location, direction));
 }
 
 bool CameraBuilder::isBuild() const

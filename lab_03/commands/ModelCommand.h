@@ -14,29 +14,28 @@ class MoveModel : public ModelCommand
 {
     using Action = void(TransformManager::*)(const std::shared_ptr<BaseObject> &object, const double &dx, const double &dy, const double &dz);
 public:
-    MoveModel(const double dx, const double dy, const double dz, const std::size_t id);
+    MoveModel(const std::shared_ptr<BaseObject> object, const double dx, const double dy, const double dz);
 
     virtual void execute() override;
 
 private:
+    std::shared_ptr<BaseObject> _object;
     double _dx, _dy, _dz;
-    std::size_t _id;
     Action _method;
 };
-
 
 
 class ScaleModel : public ModelCommand
 {
     using Action = void(TransformManager::*)(const std::shared_ptr<BaseObject> &object, const double &kx, const double &ky, const double &kz);
 public:
-    ScaleModel(const double kx, const double ky, const double kz, const std::size_t id);
+    ScaleModel(const std::shared_ptr<BaseObject> object, const double kx, const double ky, const double kz);
 
     virtual void execute() override;
 
 private:
+    std::shared_ptr<BaseObject> _object;
     double _kx, _ky, _kz;
-    std::size_t _id;
     Action _method;
 };
 
@@ -46,13 +45,13 @@ class RotateModel : public ModelCommand
 {
     using Action = void(TransformManager::*)(const std::shared_ptr<BaseObject> &object, const double &ox, const double &oy, const double &oz);
 public:
-    RotateModel(const double ox, const double oy, const double oz, const std::size_t id);
+    RotateModel(const std::shared_ptr<BaseObject> object, const double ox, const double oy, const double oz);
 
     virtual void execute() override;
 
 private:
+    std::shared_ptr<BaseObject> _object;
     double _ox, _oy, _oz;
-    std::size_t _id;
     Action _method;
 };
 
@@ -62,13 +61,13 @@ class TransformModel : public ModelCommand
 {
     using Action = void(TransformManager::*)(const std::shared_ptr<BaseObject> &object, const Matrix<double> &mtr);
 public:
-    TransformModel(const Matrix<double> &mtr, const std::size_t id);
+    TransformModel(const std::shared_ptr<BaseObject> object, const Matrix<double> &mtr);
 
     virtual void execute() override;
 
 private:
+    std::shared_ptr<BaseObject> _object;
     Matrix<double> _mtr;
-    std::size_t _id;
     Action _method;
 };
 
@@ -87,19 +86,32 @@ private:
     Action _method;
 };
 
+class AddModel: public ModelCommand
+{
+    using Action = std::size_t(SceneManager::*)(const shared_ptr<BaseObject> &object);
+public:
+    AddModel(ID &id, shared_ptr<BaseObject> object);
 
+    virtual void execute() override;
+private:
+    ID &_id;
+    std::shared_ptr<BaseObject> _object;
+
+    Action _method;
+};
 
 class LoadModel : public ModelCommand
 {
     using Action = std::shared_ptr<BaseObject>(LoadManager::*)(std::string &name);
 public:
-    LoadModel(const ID &id, std::string &fileName);
+    LoadModel(std::shared_ptr<BaseObject> &object, std::string &fileName);
 
     virtual void execute() override;
 
 private:
+    std::shared_ptr<BaseObject> &_object;
     std::string _fileName;
-    ID _id;
+
     Action _method;
 };
 

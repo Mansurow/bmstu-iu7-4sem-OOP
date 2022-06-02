@@ -16,8 +16,3 @@ void BaseCommand::setManagers(std::shared_ptr<DrawManager> drawManager,
     _sceneLoadModerator = sceneLoadModerator;
     _drawCompositeAdapter = drawCompositeAdapter;
 }
-
-//void BaseCommand::setScene(std::shared_ptr<Scene> scene)
-//{
-//    _scene = scene;
-//}

@@ -24,8 +24,6 @@ public:
                              std::shared_ptr<SceneLoadModerator> sceneLoadModerator,
                              std::shared_ptr<DrawCompositeAdapter> drawCompositeAdapter);
 
-    //virtual void setScene(std::shared_ptr<Scene> scene);
-
     virtual void execute() = 0;
 
 protected:
@@ -36,7 +34,6 @@ protected:
     std::shared_ptr<ModelLoadModerator> _modelLoadModerator;
     std::shared_ptr<SceneLoadModerator> _sceneLoadModerator;
     std::shared_ptr<DrawCompositeAdapter> _drawCompositeAdapter;
-    //std::shared_ptr<Scene> _scene;
 };
 
 

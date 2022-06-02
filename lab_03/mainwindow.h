@@ -34,9 +34,7 @@ private slots:
     void on_addCameraBtn_clicked();
 
     void on_loadModelBtn_clicked();
-
     void on_deleteModelBtn_clicked();
-
     void on_deleteModelsBtn_clicked();
 
     void on_cameraCB_currentIndexChanged(int index);
@@ -62,6 +60,13 @@ private slots:
     void on_scaleAllBtn_clicked();
 
     void on_rotateAllBtn_clicked();
+    void on_rightUpBtn_clicked();
+
+    void on_rigntDownBtn_clicked();
+
+    void on_leftDownBtn_clicked();
+
+    void on_leftUpBtn_clicked();
 
 protected:
     void setupScene();
@@ -72,11 +77,14 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *_scene;
+    //QGraphicsScene *_scene;
+    std::shared_ptr<QGraphicsScene> _scene;
     std::shared_ptr<Facade> _facade;
     std::shared_ptr<BaseDrawer> _drawer;
+
     std::vector<std::size_t> _models;
     std::vector<std::size_t> _cameras;
-    std::size_t _camInd;
+    std::size_t _camInd = 0;
+    std::size_t _modInd = 0;
 };
 #endif // MAINWINDOW_H

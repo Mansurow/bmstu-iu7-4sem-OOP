@@ -5,9 +5,9 @@
 
 #include <BaseManager.h>
 #include <BaseModel.h>
-#include <baseloadmoderator.h>
-#include <sceneloadmoderator.h>
-#include <modelloadmoderator.h>
+#include <BaseLoadModerator.h>
+#include <SceneLoadModerator.h>
+#include <ModelLoadModerator.h>
 
 class LoadManager : BaseManager
 {

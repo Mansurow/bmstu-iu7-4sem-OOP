@@ -5,11 +5,11 @@
 #include <utility>
 
 #include "BaseObject.h"
-#include "basemodel.h"
+#include "BaseModel.h"
 #include "Point.h"
 #include "Edge.h"
 #include "Data.h"
-#include "drawcarcassmodeladapter.h"
+#include "DrawCarcassModelAdapter.h"
 
 class CarcassModel : public BaseModel
 {

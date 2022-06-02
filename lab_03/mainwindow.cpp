@@ -21,9 +21,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupScene()
 {
-    _scene = new QGraphicsScene(this);
+    _scene = std::make_shared<QGraphicsScene>(this);
 
-    ui->graphicsView->setScene(_scene);
+    ui->graphicsView->setScene(_scene.get());
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     auto cont = ui->graphicsView->contentsRect();
@@ -31,15 +31,19 @@ void MainWindow::setupScene()
     _camInd = 1;
 
     auto solution(new DrawerSolution<QtFactory, QGraphicsScene>());
-    _drawer = solution->createDrawer(_scene);
+    _drawer = solution->createDrawer(_scene.get());
 }
 
 void MainWindow::updateScene()
 {
+    auto scene = std::make_shared<Scene>();
     ClearScene clear_cmd(_drawer);
     _facade->execute(clear_cmd);
 
-    DrawScene draw_cmd(_drawer);
+    GetScene get_scene_cmd(scene);
+    _facade->execute(get_scene_cmd);
+
+    DrawScene draw_cmd(scene, _drawer);
     _facade->execute(draw_cmd);
 }
 
@@ -76,7 +80,8 @@ void MainWindow::on_addCameraBtn_clicked()
 
     auto id = std::make_shared<size_t>(0);
     Point location(cont.width() / 2.0, cont.height() / 2.0, 0.0);
-    AddCamera addCMD(id, location);
+    Point direction(0, 0, 0);
+    AddCamera addCMD(id, location, direction);
 
     _facade->execute(addCMD);
     _cameras.push_back(*id);
@@ -103,19 +108,22 @@ void MainWindow::on_loadModelBtn_clicked()
         return;
     }
 
-    //auto path = QFileDialog::getOpenFileName(nullptr, "Загрузка модели", "../lab_03/data/cube.txt");
+    auto path = QFileDialog::getOpenFileName(nullptr, "Загрузка модели", "../lab_03/data/cube.txt");
 
-    //if (path.isNull())
-    //    return;
+    if (path.isNull())
+        return;
 
-    shared_ptr<size_t> id = std::make_shared<size_t>(0);
-    std::string pathFileName = "../lab_03/data/cube.txt";//path.toStdString();
-
-    LoadModel cmd(id, pathFileName);
+    std::shared_ptr<BaseObject> model = std::make_shared<CarcassModel>();
+    auto id = std::make_shared<size_t>(0);
+    std::string pathFileName = path.toStdString();
 
     try
     {
-        _facade->execute(cmd);
+        LoadModel load_cmd(model, pathFileName);
+        _facade->execute(load_cmd);
+
+        AddModel add_cmd(id, model);
+        _facade->execute(add_cmd);
     }
     catch (const BaseException &error)
     {
@@ -125,9 +133,10 @@ void MainWindow::on_loadModelBtn_clicked()
 
     _models.push_back(*id);
     updateScene();
-
-    std::string figName = std::string("CarcasModel");
-    ui->modelsCB->addItem(QString(figName.data()));
+    _modInd++;
+    auto fileName = QFileInfo(path.toUtf8().data()).fileName();
+    QString figName = QString("CarcasModel") + QString::number(_modInd) + QString(" load from ") + QString(fileName);
+    ui->modelsCB->addItem(figName);
     ui->modelsCB->setCurrentIndex(ui->modelsCB->count() - 1);
 }
 
@@ -251,29 +260,14 @@ void MainWindow::on_upBtn_clicked()
         return;
     }
 
-    std::size_t id = _cameras.at(ui->cameraCB->currentIndex());
-    MoveCamera cmd(0, 10, 0, id);
+    auto camera = make_shared<Camera>();
 
-    _facade->execute(cmd);
-    updateScene();
-}
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
 
-void MainWindow::on_rigthBtn_clicked()
-{
-    try
-    {
-        checkCamExist();
-    }
-    catch (const CameraException &error)
-    {
-        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
-        return;
-    }
+    MoveCamera move_cmd(camera, 0, 10, 0);
+    _facade->execute(move_cmd);
 
-    std::size_t id = _cameras.at(ui->cameraCB->currentIndex());
-    MoveCamera cmd(-10, 0, 0, id);
-
-    _facade->execute(cmd);
     updateScene();
 }
 
@@ -289,10 +283,84 @@ void MainWindow::on_downBtn_clicked()
         return;
     }
 
-    std::size_t id = _cameras.at(ui->cameraCB->currentIndex());
-    MoveCamera cmd(0, -10, 0, id);
+    auto camera = make_shared<Camera>();
 
-    _facade->execute(cmd);
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, 0, -10, 0);
+    _facade->execute(move_cmd);
+
+    updateScene();
+}
+
+void MainWindow::on_rigthBtn_clicked()
+{
+    try
+    {
+        checkCamExist();
+    }
+    catch (const CameraException &error)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
+        return;
+    }
+
+    //std::size_t id = _cameras.at(ui->cameraCB->currentIndex());
+    auto camera = make_shared<Camera>();
+
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, -10, 0, 0);
+    _facade->execute(move_cmd);
+
+    updateScene();
+}
+
+void MainWindow::on_rightUpBtn_clicked()
+{
+    try
+    {
+        checkCamExist();
+    }
+    catch (const CameraException &error)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
+        return;
+    }
+
+    auto camera = make_shared<Camera>();
+
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, -10, 10, 0);
+    _facade->execute(move_cmd);
+
+    updateScene();
+}
+
+void MainWindow::on_rigntDownBtn_clicked()
+{
+    try
+    {
+        checkCamExist();
+    }
+    catch (const CameraException &error)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
+        return;
+    }
+
+    auto camera = make_shared<Camera>();
+
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, -10, -10, 0);
+    _facade->execute(move_cmd);
+
     updateScene();
 }
 
@@ -308,12 +376,63 @@ void MainWindow::on_leftBtn_clicked()
         return;
     }
 
-    std::size_t id = _cameras.at(ui->cameraCB->currentIndex());
-    MoveCamera cmd(10, 0, 0, id);
+    auto camera = make_shared<Camera>();
 
-    _facade->execute(cmd);
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, 10, 0, 0);
+    _facade->execute(move_cmd);
+
     updateScene();
 }
+
+void MainWindow::on_leftUpBtn_clicked()
+{
+    try
+    {
+        checkCamExist();
+    }
+    catch (const CameraException &error)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
+        return;
+    }
+
+    auto camera = make_shared<Camera>();
+
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, 10, 10, 0);
+    _facade->execute(move_cmd);
+
+    updateScene();
+}
+
+void MainWindow::on_leftDownBtn_clicked()
+{
+    try
+    {
+        checkCamExist();
+    }
+    catch (const CameraException &error)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Не загружено ни одной камеры.");
+        return;
+    }
+
+    auto camera = make_shared<Camera>();
+
+    GetMainCamera get_camera(camera);
+   _facade->execute(get_camera);
+
+    MoveCamera move_cmd(camera, 10, -10, 0);
+    _facade->execute(move_cmd);
+
+    updateScene();
+}
+
 
 void MainWindow::on_moveBtn_clicked()
 {
@@ -329,15 +448,18 @@ void MainWindow::on_moveBtn_clicked()
     }
     catch (const ModelException &error)
     {
-        QMessageBox::critical(nullptr, "Ошибка", "Нет моделей!");
+        QMessageBox::critical(nullptr, "Ошибка", "Нет каркасных фигур!");
         return;
     }
 
-    MoveModel cmd(ui->dxDSB->value(),
-                  ui->dyDSB->value(),
-                  ui->dzDSB->value(),
-                  _models.at(ui->modelsCB->currentIndex()));
-    _facade->execute(cmd);
+    shared_ptr<BaseObject> model = std::make_shared<CarcassModel>();
+
+    GetSceneObject get_object_cmd(model, _models.at(ui->modelsCB->currentIndex()));
+    _facade->execute(get_object_cmd);
+
+    MoveModel move_cmd(model, ui->dxDSB->value(), ui->dyDSB->value(), ui->dzDSB->value());
+    _facade->execute(move_cmd);
+
     updateScene();
 }
 
@@ -359,12 +481,16 @@ void MainWindow::on_moveAllBtn_clicked()
         return;
     }
 
-    MoveModels cmd(
+    auto composite = std::make_shared<Composite>();
+    GetSceneObjects get_objs(composite);
+    _facade->execute(get_objs);
+
+    MoveModels move_cmd(composite,
             ui->dxDSB->value(),
             ui->dyDSB->value(),
             ui->dzDSB->value());
 
-    _facade->execute(cmd);
+    _facade->execute(move_cmd);
     updateScene();
 }
 
@@ -386,13 +512,18 @@ void MainWindow::on_scaleBtn_clicked()
         return;
     }
 
-    ScaleModel cmd(
+    shared_ptr<BaseObject> model = std::make_shared<CarcassModel>();
+
+    GetSceneObject get_object_cmd(model, _models.at(ui->modelsCB->currentIndex()));
+    _facade->execute(get_object_cmd);
+
+
+    ScaleModel scale_cmd(model,
             ui->kxDSB->value(),
             ui->kyDSB->value(),
-            ui->kzDSB->value(),
-            _models.at(ui->modelsCB->currentIndex()));
+            ui->kzDSB->value());
+    _facade->execute(scale_cmd);
 
-    _facade->execute(cmd);
     updateScene();
 }
 
@@ -414,12 +545,16 @@ void MainWindow::on_scaleAllBtn_clicked()
         return;
     }
 
-    ScaleModels cmd(
+    auto composite = std::make_shared<Composite>();
+    GetSceneObjects get_objs(composite);
+    _facade->execute(get_objs);
+
+    ScaleModels scale_cmd(composite,
             ui->kxDSB->value(),
             ui->kyDSB->value(),
             ui->kzDSB->value());
+    _facade->execute(scale_cmd);
 
-    _facade->execute(cmd);
     updateScene();
 }
 
@@ -441,13 +576,17 @@ void MainWindow::on_rotateBtn_clicked()
         return;
     }
 
-    RotateModel cmd(
+    shared_ptr<BaseObject> model = std::make_shared<CarcassModel>();
+
+    GetSceneObject get_object_cmd(model, _models.at(ui->modelsCB->currentIndex()));
+    _facade->execute(get_object_cmd);
+
+    RotateModel rotate_cmd(model,
             ui->oxDSB->value() * M_PI / 180,
             ui->oyDSB->value() * M_PI / 180,
-            ui->ozDSB->value() * M_PI / 180,
-            _models.at(ui->modelsCB->currentIndex()));
+            ui->ozDSB->value() * M_PI / 180);
+    _facade->execute(rotate_cmd);
 
-    _facade->execute(cmd);
     updateScene();
 }
 
@@ -469,12 +608,15 @@ void MainWindow::on_rotateAllBtn_clicked()
         return;
     }
 
-    RotateModels cmd(
+    auto composite = std::make_shared<Composite>();
+    GetSceneObjects get_objs(composite);
+    _facade->execute(get_objs);
+
+    RotateModels rotate_cmd(composite,
             ui->oxDSB->value() * M_PI / 180,
             ui->oyDSB->value() * M_PI / 180,
             ui->ozDSB->value() * M_PI / 180);
+    _facade->execute(rotate_cmd);
 
-    _facade->execute(cmd);
     updateScene();
 }
-

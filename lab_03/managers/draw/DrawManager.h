@@ -20,8 +20,11 @@ public:
     ~DrawManager() = default;
 
     void setAdapter(std::shared_ptr<DrawCompositeAdapter> adapter);
+    void setCamera(std::shared_ptr<Camera> camera) { _adapter->setCamera(camera); };
 
-    void drawScene(std::shared_ptr<Scene> scene);
+    void clearScene(std::shared_ptr<BaseDrawer> drawer) { drawer->clearScene(); };
+
+    void drawScene(std::shared_ptr<Scene> scene, std::shared_ptr<BaseDrawer> drawer);
 
 private:
     std::shared_ptr<DrawCompositeAdapter> _adapter;

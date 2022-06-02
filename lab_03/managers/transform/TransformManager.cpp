@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "transformmanager.h"
+#include "TransformManager.h"
 
 void TransformManager::moveObject(const std::shared_ptr <BaseObject> &object,
                                   const double &dx,

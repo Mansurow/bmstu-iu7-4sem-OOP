@@ -10,7 +10,7 @@ public:
     ~CameraBuilder() = default;
 
     void build() override;
-    void buildLocation(const Point &location) override;
+    void buildLocation(const Point &location, const Point &direction) override;
     bool isBuild() const override;
 
     std::shared_ptr<Camera> get() override;
