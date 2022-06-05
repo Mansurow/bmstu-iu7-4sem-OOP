@@ -3,12 +3,14 @@
 
 #include <QPushButton>
 #include <memory>
+#include "../defines.hpp"
 
 class Button : public QPushButton
 {
     Q_OBJECT;
 
-    using buttonState = enum {
+    using ButtonState = enum
+    {
         ACTIVE,
         INACTIVE
     };
@@ -24,12 +26,12 @@ signals:
     void unpressSignal();
 
 public slots:
-    void press();
-    void unpress();
+    void pressSlot();  // -> Active
+    void unpressSlot(); // -> InActive
 
 private:
-    buttonState _state;
-    size_t _curButtonFloor;
+    ButtonState _state;
+    size_t _currentButtonFloor;
 };
 
 #endif// LAB_04_BUTTON_HPP

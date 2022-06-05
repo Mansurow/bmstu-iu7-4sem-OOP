@@ -3,7 +3,7 @@
 
 Cabin::Cabin(QObject *parent) : QObject(parent)
 {
-    _state = FREE;
+    _state = STOP;
 
     // Сигнал открывания дверей => просим двери открыть двери
     QObject::connect(this, SIGNAL(openDoors()), &_doors, SLOT(startOpening()));
@@ -17,7 +17,7 @@ Cabin::Cabin(QObject *parent) : QObject(parent)
 
 void Cabin::stopCabin()
 {
-        _state = WAITS;
+        _state = WAIT;
 
         _moveTimer.stop();
         emit openDoors(); // signal открыть двери
@@ -25,7 +25,7 @@ void Cabin::stopCabin()
 
 void Cabin::moveCabin()
 {
-    if (_state == FREE || _state == MOVING)
+    if (_state == STOP || _state == MOVING)
     {
         _state = MOVING;
         _moveTimer.start(MOVE_TIME);
@@ -34,9 +34,9 @@ void Cabin::moveCabin()
 
 void Cabin::free()
 {
-    if (_state != FREE)
+    if (_state != STOP)
     {
-        _state = FREE;
+        _state = STOP;
         emit cabinFinished(false);
     }
 }

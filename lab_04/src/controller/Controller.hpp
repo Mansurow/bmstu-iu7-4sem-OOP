@@ -14,7 +14,8 @@ class Controller : public QWidget
 {
     Q_OBJECT
 
-    using controllerState = enum {
+    using ControllerState = enum
+    {
         FREE,
         BUSY
     };
@@ -30,7 +31,7 @@ signals:
 
 public slots:
     void newTarget(bool ,int = 1);  // -> BUSY
-    void reachFloor();                       // -> FREE
+    void reachFloor();              // -> FREE
 
 private:
     bool _identifyNewTarget(int &new_target);
@@ -38,13 +39,14 @@ private:
     void _updateFloor();
 
 private:
-    int _curFloor = 1;
-    int _targetFloor = 1;
+    int _curFloor = START_FLOOR;
+    int _targetFloor = START_FLOOR;
 
+    Direction _last_direction = STAY;
     Direction _direction = STAY;
 
-    controllerState _state = FREE;
-    std::vector<bool> _floorsToVisit;
+    ControllerState _state = FREE;
+    std::vector<bool> _is_visit;
 
     std::vector<std::shared_ptr<Button>> _buttons_floor;
     std::vector<std::shared_ptr<Button>> _buttons_lift;

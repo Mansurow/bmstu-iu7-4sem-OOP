@@ -13,9 +13,9 @@ class Cabin : public QObject
     Q_OBJECT
 
     using cabinState = enum {
-        WAITS,
+        WAIT,
         MOVING,
-        FREE
+        STOP
     };
 
 public:
@@ -29,9 +29,9 @@ signals:
     void cabinFinished(bool, int=1);
 
 public slots:
-    void stopCabin();           // -> WAITS
+    void stopCabin();         // -> WAIT
     void moveCabin();        // -> MOVING
-    void free();                      // -> FREE
+    void free();             // -> STOP
 
 private:
     cabinState _state;

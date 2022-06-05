@@ -23,11 +23,12 @@ Controller::Controller(QWidget *parent) : QWidget(parent)
         auto new_button = std::make_shared<Button>();
         new_button->setFloor(FLOORS - i);
         new_button->setText(QString::number(FLOORS - i));
+        new_button->setStyleSheet(QString("background-color:") + COLORBUTTONINACTIVE);
 
         this->_buttons_floor.insert(this->_buttons_floor.begin(), new_button);
         _layout->addWidget(dynamic_cast<QPushButton *>(new_button.get()));
 
-        _floorsToVisit.push_back(false);
+        _is_visit.push_back(false);
 
         // нажата кнопка => добавляем этаж в цели
         QObject::connect(new_button.get(), SIGNAL(pressSignal(bool,int)), this, SLOT(newTarget(bool,int)));
@@ -44,17 +45,18 @@ Controller::Controller(QWidget *parent) : QWidget(parent)
 
     for (size_t i = 0; i < FLOORS; i++)
     {
-        auto new_button = std::make_shared<Button>();
-        new_button->setFloor(FLOORS - i);
-        new_button->setText(QString::number(FLOORS - i));
+        auto button = std::make_shared<Button>();
+        button->setFloor(FLOORS - i);
+        button->setText(QString::number(FLOORS - i));
+        button->setStyleSheet(QString("background-color:") + COLORBUTTONINACTIVE);
 
-        this->_buttons_lift.insert(this->_buttons_lift.begin(), new_button);
-        _layout->addWidget(dynamic_cast<QPushButton *>(new_button.get()));
+        this->_buttons_lift.insert(this->_buttons_lift.begin(), button);
+        _layout->addWidget(dynamic_cast<QPushButton *>(button.get()));
 
-        _floorsToVisit.push_back(false);
+        _is_visit.push_back(false);
 
         // нажата кнопка => добавляем этаж в цели
-        QObject::connect(new_button.get(), SIGNAL(pressSignal(bool,int)), this, SLOT(newTarget(bool,int)));
+        QObject::connect(button.get(), SIGNAL(pressSignal(bool,int)), this, SLOT(newTarget(bool,int)));
     }
 
 
@@ -66,7 +68,7 @@ void Controller::newTarget(bool got_new, int floor)
     this->_state = BUSY;
     if (got_new)
     {
-        this->_floorsToVisit[floor - 1] = true;
+        this->_is_visit[floor - 1] = true;
 
         _identifyNewTarget(floor);
         _targetFloor = floor;
@@ -112,6 +114,7 @@ void Controller::_decideDirection()
     }
     else
     {
+        _last_direction = _direction;
         _direction = STAY;
     }
 }
@@ -123,33 +126,16 @@ bool Controller::_identifyNewTarget(int &new_target)
     Direction dir;
 
     if (_direction != STAY)
-    {
         dir = _direction;
-    }
     else
-    {
-        int down_index = 0, top_index = 0;
-        for (int i = 0, j = FLOORS - 1; i < (_curFloor - 1) || j > (_curFloor - 1);) {
-            if ( i < _curFloor && _floorsToVisit[i])
-                down_index = i;
-                i ++;
-
-            if (j > _curFloor && _floorsToVisit[j])
-                top_index = j;
-                j --;
-        }
-
-        dir = (((_curFloor - 1) - down_index) < (top_index - (_curFloor - 1))) ? DOWN : UP;
-    }
+        dir = (_last_direction == STAY) ? UP: _last_direction;
 
     for (int i = _curFloor; !rc && i <= FLOORS && i > 0; i = i + dir)
-    {
-        if (_floorsToVisit[i - 1])
+        if (_is_visit[i - 1])
         {
             new_target = i;
             rc = true;
         }
-    }
 
     if (!rc)
     {
@@ -157,7 +143,7 @@ bool Controller::_identifyNewTarget(int &new_target)
 
         for (int i = _curFloor; !rc && i <= FLOORS && i > 0; i = i + dir)
         {
-            if (_floorsToVisit[i - 1])
+            if (_is_visit[i - 1])
             {
                 new_target = i;
                 rc = true;
@@ -179,7 +165,7 @@ void Controller::reachFloor()
 
     emit _buttons_lift[_targetFloor - 1]->unpressSignal(); // кнопка разжимается
 
-    _floorsToVisit[_targetFloor - 1] = false; // посещать его уже не надо
+    _is_visit[_targetFloor - 1] = false; // посещать его уже не надо
 
 
     // проверим, есть ли ещё цели
