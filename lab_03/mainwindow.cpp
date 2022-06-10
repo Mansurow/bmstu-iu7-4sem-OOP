@@ -620,3 +620,4 @@ void MainWindow::on_rotateAllBtn_clicked()
 
     updateScene();
 }
+

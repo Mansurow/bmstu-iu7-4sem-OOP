@@ -56,6 +56,7 @@ private:
 };
 
 
+
 class SetCamera: public CameraCommand
 {
     using Action = void(SceneManager::*)(size_t id);
